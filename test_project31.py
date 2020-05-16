@@ -8,7 +8,6 @@ import im_util
 # edit this line to change the figure size
 plt.rcParams['figure.figsize'] = (16.0, 10.0)
 plt.rcParams['font.size'] = 16
-# force auto-reload of import modules before running code
 
 """Load CIFAR10 data"""
 
@@ -43,6 +42,7 @@ for i in range(10):
 
 Compute the average image for each class and store in avg_im
 """
+
 avg_im = []
 
 for i in range(num_classes):
@@ -97,13 +97,12 @@ print('Nearest mean classifier accuracy = %.2f%%' % (100.0*nm_accuracy))
 
 """Nearest Neighbour Classifier"""
 
-num_test_small=1000
-X_test_small=X_test[0:num_test_small]
-Y_test_small=Y_test[0:num_test_small]
+num_test_small = 1000
+X_test_small = X_test[0:num_test_small]
+Y_test_small = Y_test[0:num_test_small]
 
-#FORNOW: random labels
-Y_hat=np.random.randint(0,10,num_test_small)
-
+# FORNOW: random labels
+Y_hat = np.random.randint(0, 10, num_test_small)
 
 """
 *****************************************************
@@ -113,13 +112,15 @@ Y_hat=np.random.randint(0,10,num_test_small)
 Set the predictions Y_hat for the test set using nearest neighbours from the training set
 """
 
+
 def compute_distances(M1, M2):
     N1, num_dims = M1.shape
     N2, num_dims = M2.shape
     ATB = np.dot(M1, M2.T)
     AA = np.sum(M1 * M1, 1)
     BB = np.sum(M2 * M2, 1)
-    return -2*ATB + np.expand_dims(AA, 1) + BB
+    return -2 * ATB + np.expand_dims(AA, 1) + BB
+
 
 dists = compute_distances(X_test_small, X_train)
 
@@ -127,10 +128,84 @@ for i in range(num_test_small):
     argmin = np.argmin(dists[i])
     Y_hat[i] = Y_train[argmin]
 
+"""
+*****************************************************
+"""
+
+nn_accuracy = np.sum(Y_hat == Y_test_small) / num_test_small
+print('Nearest neighbour classifier accuracy =% .2f%%' % (100.0 * nn_accuracy))
+
+"""Linear Classifier"""
+
+#FORNOW: random weight matrix for W
+W=np.random.randn(num_dims,num_classes)
+
+def one_hot(Y, num_classes):
+    """convert class labels to one-hot vector"""
+    num_train=Y.size
+    T = np.zeros((num_train, num_classes))
+    T[np.arange(num_train), Y]=1
+    return T
+
+"""
+*****************************************************
+*** TODO: fit a linear classifier to the CIFAR10 data
+*****************************************************
+
+Set the weight vector W by solving a linear system with training data and targets
+"""
+
+Y_hot = one_hot(Y_train, num_classes)
+W, _, _, _ = np.linalg.lstsq(X_train, Y_hot, rcond=None)
 
 """
 *****************************************************
 """
 
-nn_accuracy=np.sum(Y_hat==Y_test_small)/num_test_small
-print('Nearest neighbour classifier accuracy =% .2f%%' % (100.0*nn_accuracy))
+# predict labels on the test set using W
+T_hat = np.dot(X_test,W)
+Y_hat = np.argmax(T_hat,1)
+
+lin_accuracy=np.sum(Y_hat==Y_test)/num_test
+
+print('Linear classifier accuracy =% .2f%%' % (100.0*lin_accuracy))
+
+# visualise the linear weights
+im_util.plot_weights(W, cifar10_names)
+
+"""Regularised Linear Classifier"""
+
+#FORNOW: random weight matrix for W
+W=np.random.randn(num_dims,num_classes)
+
+lam=1.0 # regularization parameter lambda
+
+"""
+*****************************************************
+*** TODO: add regularization to the linear classifier
+*****************************************************
+
+Add an L2 penalty to the weights using regularization parameter lam
+"""
+
+dW = 2 * np.dot(np.abs(np.dot(X_train, W) - Y_hot), X_train) + 2 * lam * W
+W = np.linalg.solve(dW, [0])
+
+"""
+*****************************************************
+"""
+
+# compute accuracy on the test set
+
+def linear_classify(X,W,Y):
+  T_hat = np.dot(X,W)
+  Y_hat = np.argmax(T_hat,1)
+  accuracy = np.sum(Y_hat==Y)/np.size(Y)
+  return Y_hat, accuracy
+
+_,lin_acc=linear_classify(X_test,W,Y_test)
+
+print('Linear classifier accuracy =% .2f%%' % (100.0*lin_accuracy))
+
+# visualise the linear weights
+im_util.plot_weights(W, cifar10_names)

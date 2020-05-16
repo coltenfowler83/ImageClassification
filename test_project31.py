@@ -113,14 +113,20 @@ Y_hat=np.random.randint(0,10,num_test_small)
 Set the predictions Y_hat for the test set using nearest neighbours from the training set
 """
 
+def compute_distances(M1, M2):
+    N1, num_dims = M1.shape
+    N2, num_dims = M2.shape
+    ATB = np.dot(M1, M2.T)
+    AA = np.sum(M1 * M1, 1)
+    BB = np.sum(M2 * M2, 1)
+    return -2*ATB + np.expand_dims(AA, 1) + BB
+
+dists = compute_distances(X_test_small, X_train)
+
 for i in range(num_test_small):
-    pred_dist, pred_label = float('inf'), -1
-    for j in range(num_train):
-        dist = np.linalg.norm(X_test_small[i] - X_train[j])
-        if dist < pred_dist:
-            pred_dist = dist
-            pred_label = Y_train[pred_label]
-    Y_hat[i] = pred_label
+    argmin = np.argmin(dists[i])
+    Y_hat[i] = Y_train[argmin]
+
 
 """
 *****************************************************

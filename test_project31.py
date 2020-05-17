@@ -188,8 +188,9 @@ lam=1.0 # regularization parameter lambda
 Add an L2 penalty to the weights using regularization parameter lam
 """
 
-dW = 2 * np.dot(X_train.T, np.dot(X_train, W) - Y_hot) + 2 * lam * W
-W = np.linalg.solve(dW, np.zeros(10))
+a = np.dot(X_train.T, X_train) + lam * np.eye(num_dims, num_dims)
+b = np.dot(X_train.T, Y_hot)
+W = np.linalg.solve(a, b)
 
 """
 *****************************************************

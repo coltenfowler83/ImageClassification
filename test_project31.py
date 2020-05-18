@@ -76,7 +76,7 @@ for i in range(num_iterations):
     X_batch = X_train[batch_idx]
     Y_batch = Y_train[batch_idx]
     Y_batch_hot = one_hot(Y_batch, num_classes)
-    grd = np.dot(X_batch.T, (np.dot(X_batch, W) - Y_batch_hot))
+    grd = 2 * np.dot(X_batch.T, (np.dot(X_batch, W) - Y_batch_hot)) + 2 * weight_decay * W
     dW = -learning_rate * grd
 
     """

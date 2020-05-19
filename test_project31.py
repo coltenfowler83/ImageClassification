@@ -42,27 +42,28 @@ def one_hot(Y, num_classes):
 
 """Linear Classifier by Stochastic Gradient Descent"""
 
-batch_size = 32
-weight_decay = 0.01  # same as lambda
-learning_rate = 0.01
+batch_size=32
+weight_decay=10000 # same as lambda
+learning_rate=1e-7
 
-num_epochs = 10
-num_iterations = num_epochs * (int)(num_train / batch_size)
+num_epochs=10
+num_iterations=num_epochs*(int)(num_train/batch_size)
 
 np.random.seed(42)
-W = np.random.randn(num_dims, num_classes)
+W=np.random.randn(num_dims,num_classes)
 
-valid_acc_seq = []
-iteration_seq = []
-W_seq = []
-W_sq_seq = []
 
-summary_interval = 1000
+valid_acc_seq=[]
+iteration_seq=[]
+W_seq=[]
+W_sq_seq=[]
+
+summary_interval=1000
 
 for i in range(num_iterations):
 
-    # FORNOW: random gradient
-    grd = np.random.randn(num_dims, num_classes)
+    #FORNOW: random gradient
+    grd = np.random.randn(num_dims,num_classes)
     dW = -grd
     """
     *************************************************************************************
@@ -85,32 +86,32 @@ for i in range(num_iterations):
     W = W + dW
 
     if (i % summary_interval == 0):
-        _, valid_acc = linear_classify(X_valid, W, Y_valid)
+        _,valid_acc=linear_classify(X_valid,W,Y_valid)
         valid_acc_seq.append(valid_acc)
         iteration_seq.append(i)
         print(' valid acc =% .2f%%' % (100.0 * valid_acc))
         W_seq.append(W)
-        W_sq_seq.append(np.sum(W ** 2))
+        W_sq_seq.append(np.sum(W**2))
 
 # plot validation accuracy and weight trends
 plt.rcParams['figure.figsize'] = (16.0, 6.0)
 
-fig = plt.figure()
+fig=plt.figure()
 plt.grid(True)
-plt.plot(iteration_seq, valid_acc_seq, 'r')
+plt.plot(iteration_seq,valid_acc_seq,'r')
 plt.xlabel('iteration')
 plt.ylabel('accuracy')
-plt.ylim(0, 0.5)
+plt.ylim(0,0.5)
 plt.legend(['valid'])
 
-fig = plt.figure()
+fig=plt.figure()
 plt.grid(True)
-plt.plot(iteration_seq, np.log(W_sq_seq))
+plt.plot(iteration_seq,np.log(W_sq_seq))
 plt.xlabel('iteration')
 plt.ylabel('log |W|^2')
 
 # compute test accuracy
-Y_hat, test_acc = linear_classify(X_test, W, Y_test)
-print('\ntest accuracy = %.2f%%' % (100.0 * test_acc))
-im_util.plot_classification_examples(Y_hat, Y_test, im_test, cifar10_names)
-im_util.plot_weights(W, cifar10_names)
+Y_hat,test_acc=linear_classify(X_test,W,Y_test)
+print('\ntest accuracy = %.2f%%' % (100.0*test_acc))
+im_util.plot_classification_examples(Y_hat,Y_test,im_test,cifar10_names)
+im_util.plot_weights(W,cifar10_names)

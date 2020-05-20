@@ -47,8 +47,8 @@ print(cifar10_names[train_labels[rnd][0]])
 model=keras.models.Sequential()
 
 #FORNOW: placeholder model, replace this with your own model
-model.add(layers.Conv2D(filters=10,kernel_size=1,input_shape=(32,32,3)))
-model.add(layers.GlobalAveragePooling2D())
+#model.add(layers.Conv2D(filters=10,kernel_size=1,input_shape=(32,32,3)))
+#model.add(layers.GlobalAveragePooling2D())
 
 """
 *************************************************************
@@ -58,6 +58,14 @@ model.add(layers.GlobalAveragePooling2D())
 The model should compute a single linear function of the input pixels
 """
 
+model.add(layers.Flatten(input_shape=(32, 32, 3)))
+model.add(layers.Dense(10))
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+model.fit(train_images0, train_labels0, epochs=10)
 
 """
 *************************************************************
